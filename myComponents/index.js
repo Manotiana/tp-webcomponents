@@ -13,6 +13,21 @@ template.innerHTML = `
     H1 {
           color:red;
     }
+    .controls-flex-container{
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      width: 200px;
+      height: 40px;
+      background-color: #484848;
+    }
+    .stop{
+        width: 16px;
+        height: 16px;
+        background: white;
+        border: none;
+        cursor: pointer;
+    }
   </style>
   
   <audio id="myPlayer" crossorigin>
@@ -22,11 +37,20 @@ template.innerHTML = `
         <!-- <source src="http://mainline.i3s.unice.fr/mooc/LaSueur.mp3" id="player" controls loop crossorigin="anonymous""> -->
         <!-- <source src="http://mainline.i3s.unice.fr/mooc/drums.mp3"> -->
   </audio>
-    <button id="pauseButton">Pause</button>
-    <button id="playButton">Play</button>
-    <button id="retourZero">Retour à zero</button>
-    <button id ="currentPlus">Current+=10</button>
-    <button id="setLoop"></button>
+  <div class ="controls-flex-container">
+    <input type="image" id="playButton" class="custom_controls" alt="Login" width="16px" height="16px"
+   src="./assets/imgs/button_play.png">
+   <input type ="button" class="stop custom_controls" alt=""></input>
+   <input type="image" id="pauseButton" class="custom_controls" alt="Login" width="16px" height="16px"
+   src="./assets/imgs/button_pause.png">
+   <input type="image" id="retourZero" class="custom_controls" alt="Login" width="16px" height="16px"
+   src="./assets/imgs/button_replay.png">
+   <input type="image" id ="setLoop" class="custom_controls" alt="Login" width="24px" height="24px"
+   src="./assets/imgs/button_loop.png">
+   <input type="image"  id ="currentPlus"  class="custom_controls" alt="Login" width="24px" height="24px"
+   src="./assets/imgs/button_rewind.png">   
+   </div>    
+    <div id="setLoop2"></div>
     <!--<br>
     Volume: 0 <input type="range" min=0 max=1 step=0.1 oninput="player.volume=this.value"> 1-->
     <br>
@@ -197,6 +221,15 @@ class MyAudioPlayer extends HTMLElement {
   }
 
   fixRelativeImagePaths() {
+
+    let custom_controls = this.shadowRoot.querySelectorAll('.controls-flex-container > input[type=image]');
+    custom_controls.forEach((e) => {
+      let input_src = e.getAttribute('src');      
+      if(input_src !== undefined){
+        let src = e.getAttribute('src');
+        e.src = this.basePath + "/" + src;
+      }
+    });
 		// change webaudiocontrols relative paths for spritesheets to absolute
 		let webaudioControls = this.shadowRoot.querySelectorAll(
 			'webaudio-knob, webaudio-slider, webaudio-switch, img'
@@ -224,6 +257,7 @@ class MyAudioPlayer extends HTMLElement {
        
       }
     });
+     
     
   }
   
@@ -235,7 +269,10 @@ class MyAudioPlayer extends HTMLElement {
     /*this.shadowRoot.querySelector("#knobVolume").addEventListener("input", (event) => {
         this.setVolume(event.target.value);
       });*/
-    
+      stop
+    this.shadowRoot.querySelector(".stop").addEventListener("click", (event) =>{
+        this.stop();
+     });
     this.shadowRoot.querySelector("#pauseButton").addEventListener("click", (event) =>{
       this.pause();
     });
@@ -349,17 +386,21 @@ class MyAudioPlayer extends HTMLElement {
     this.player.currentTime = value;
   }
   addToCurrentTime(value){
-    this.player.currentTime = this.player.currentTime + value;
+    this.player.currentTime = this.player.currentTime - value;
+  }
+  stop(){
+    this.player.load();
   }
 
   enableDisableLoop(){
-    let setLoopButton =  this.shadowRoot.querySelector("#setLoop");   
+    let setLoopButton =  this.shadowRoot.querySelector("#setLoop");
+    let setLoopButton2 =  this.shadowRoot.querySelector("#setLoop2");
     if(this.player.loop === true){
      setLoopButton.value = 0
-     setLoopButton.textContent = "Desactivate Loop"
+     setLoopButton2.textContent = "Loop Activé"
     }else {
       setLoopButton.value = 1
-      setLoopButton.textContent = "Activate Loop"
+      setLoopButton2.textContent = "Loop Desactivé"
     } 
 
   }
